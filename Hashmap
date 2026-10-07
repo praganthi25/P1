@@ -1,0 +1,75 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Parkinglot {
+
+    ArrayList<Integer> freeSlots = new ArrayList<>();
+    HashMap<String, Integer> occupiedSlots = new HashMap<>();
+
+    Parkinglot() {
+        freeSlots.add(1);
+        freeSlots.add(2);
+    }
+
+    synchronized void park(String car) {
+        while (freeSlots.isEmpty()) {
+            System.out.println(car + " is waiting...");
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println("Thread interrupted");
+            }
+        }
+
+        int slot = freeSlots.remove(0);
+        occupiedSlots.put(car, slot);
+
+        System.out.println(car + " parked in Slot " + slot);
+    }
+
+    synchronized void leave(String car) {
+        if (occupiedSlots.containsKey(car)) {
+            int slot = occupiedSlots.remove(car);
+            freeSlots.add(slot);
+
+            System.out.println(car + " left Slot " + slot);
+
+            notifyAll();
+        }
+    }
+
+    static class Gate extends Thread {
+        Parkinglot lot;
+        String car;
+
+        Gate(Parkinglot lot, String car) {
+            this.lot = lot;
+            this.car = car;
+        }
+
+        public void run() {
+            lot.park(car);
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Parkinglot lot = new Parkinglot();
+
+        Gate g1 = new Gate(lot, "Car1");
+        Gate g2 = new Gate(lot, "Car2");
+        Gate g3 = new Gate(lot, "Car3");
+
+        g1.start();
+        g2.start();
+        g3.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            System.out.println("Main thread interrupted");
+        }
+
+        lot.leave("Car1");
+    }
+}
