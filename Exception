@@ -1,0 +1,82 @@
+import java.io.*;
+import java.nio.file.*;
+
+class ParkingFullException extends Exception {
+    ParkingFullException(String msg) {
+        super(msg);
+    }
+
+    static int count = 0;
+
+    static void park(String ticket, String vehicle)
+            throws ParkingFullException {
+
+        if (count >= 2)
+            throw new ParkingFullException("Parking lot is full");
+
+        count++;
+        System.out.println(vehicle + " entered with " + ticket);
+    }
+
+    public static void main(String[] args) {
+
+        try {
+            Path path = Paths.get("entry.log");
+
+            String log = "T101,CAR01";
+            String[] data = log.split(",");
+
+            park(data[0], data[1]);
+
+            ParkingPass pass =
+                    new ParkingPass(data[0], data[1]);
+
+            ByteArrayOutputStream bytes =
+                    new ByteArrayOutputStream();
+
+            ObjectOutputStream out =
+                    new ObjectOutputStream(bytes);
+
+            out.writeObject(pass);
+            out.close();
+
+            System.out.println("Parking pass serialized.");
+
+            exit(data[0]);
+
+        } catch (ParkingFullException e) {
+            System.out.println("Error: " + e.getMessage());
+
+        } catch (InvalidTicketException e) {
+            System.out.println("Error: " + e.getMessage());
+
+        } catch (IOException e) {
+            System.out.println("File Error: " + e.getMessage());
+        }
+    }
+
+    static void exit(String ticket)
+            throws InvalidTicketException {
+
+        if (!ticket.equals("T101"))
+            throw new InvalidTicketException("Invalid ticket");
+
+        System.out.println("Vehicle exited successfully.");
+    }
+}
+
+class InvalidTicketException extends Exception {
+    InvalidTicketException(String msg) {
+        super(msg);
+    }
+}
+
+class ParkingPass implements Serializable {
+    String ticket;
+    String vehicle;
+
+    ParkingPass(String ticket, String vehicle) {
+        this.ticket = ticket;
+        this.vehicle = vehicle;
+    }
+}
