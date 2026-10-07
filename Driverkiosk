@@ -1,0 +1,51 @@
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class DriverKiosk extends Application {
+
+    @Override
+    public void start(Stage stage) {
+
+        Label title = new Label("Driver Kiosk");
+        Label message = new Label("Select a parking slot:");
+
+        Button slot1 = new Button("Slot 1");
+        Button slot2 = new Button("Slot 2");
+        Button slot3 = new Button("Slot 3");
+
+        slot1.setOnAction(e -> {
+            message.setText("Ticket printed for Slot 1");
+        });
+
+        slot2.setOnAction(e -> {
+            message.setText("Ticket printed for Slot 2");
+        });
+
+        slot3.setOnAction(e -> {
+            message.setText("Ticket printed for Slot 3");
+        });
+
+        VBox root = new VBox(15);
+        root.getChildren().addAll(
+                title,
+                message,
+                slot1,
+                slot2,
+                slot3
+        );
+
+        Scene scene = new Scene(root, 400, 400);
+
+        stage.setTitle("Driver Kiosk");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
